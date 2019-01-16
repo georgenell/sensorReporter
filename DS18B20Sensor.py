@@ -66,6 +66,10 @@ class DS18B20Sensor(object):
 
         self.destination = params("Destination")
         self.poll = float(params("Poll"))
+        
+        self.preserveDestination = True if params("PreserveDestination").lower() == 'true' else False
+        if not self.preserveDestination:
+            self.destination = self.destination + "/temperature"
 
         self.publish = connections
 
@@ -119,8 +123,8 @@ class DS18B20Sensor(object):
         if (self.temperature is not None):
             didPublish = True
             strTemp = str(round(self.temperature, self.precisionTemp))
-            self.logger.debug("Publish temperature '{0}' to '{1}'".format(strTemp, self.destination + "/temperature"))
-            self.publishStateImpl(strTemp, self.destination + "/temperature")
+            self.logger.debug("Publish temperature '{0}' to '{1}'".format(strTemp, self.destination))
+            self.publishStateImpl(strTemp, self.destination)
 
         if (didPublish):
             self.lastPublish = time.time()
