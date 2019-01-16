@@ -1,9 +1,9 @@
 # sensorReporter
-A Python script that bridges sensors and actuators to MQTT and/or REST. It was written to support integrating remote sensors with openHAB 1.x, but it should support any remote hub that has a simple REST API or uses MQTT.
+A Python script that bridges sensors and actuators to MQTT, REST or Graphite (Carbon). It was written to support integrating remote sensors with openHAB 1.x, but it should support any remote hub that has a simple REST API or uses MQTT.
 
-The script currently supports MQTT and openHAB 1.x's REST API for publishing sensor readings and actuator results. It supports MQTT for receiving commands to activate actuators.
+The script currently supports MQTT, openHAB 1.x's REST API and Graphite's Carbon TCP API for publishing sensor readings and actuator results. It supports MQTT for receiving commands to activate actuators.
 
-The currently supported technologies are: Raspberry PI GPIO sensors and actuators, Bluetooth presence detection sensors, Dash Button presses, Roku IP address discovery, executing command line programs, DHT11/22 senors, and a hearbeat publisher.
+The currently supported technologies are: Raspberry PI GPIO sensors and actuators, Bluetooth presence detection sensors, Dash Button presses, Roku IP address discovery, executing command line programs, DHT11/22 sensors, DS18B20 sensors, and a hearbeat publisher.
 
 # Architecture
 The main script is sensorReporter.py. this script parses the configuration ini file and implements the main polling loop and thread management. During startup this script reads the ini file and creates instances of the indicated classes and passes them the arguments for that class.
@@ -26,6 +26,8 @@ Roku does not require anything special be installed.
 Execute actuator requires subprocess32 if executed on a Posix system with Python 2.7
 
 DHT11/22 requires the Adafruit DHT library.
+
+DS18B20 requires 1-Wire to be enabled.
 
 The install.sh in the config folder lists all the commands necessary to install dependencies, link the current folder to /opt and set it up to start as a service. It has the scripts and commands for both upstart and systemd. However, this script is not intended to be run as is and instead is intended as a guide.
 
@@ -113,3 +115,8 @@ https://learn.adafruit.com/dht-humidity-sensing-on-raspberry-pi-with-gdocs-loggi
 # Exec Specitics
 The exec sensor will periodically execute the given shell script and publish the result or 'ERROR' if the script didn't return a 0 exitcode to the configured destination. 
 Avoid making the polling period shorter than it takes the script to run in the worst case or else you will run out of threads to run the sensorReporter.
+
+# DS18B20 Specifics
+Temperature readings from a 1-Wire DS18B20, or a chain of them, may be made in either run in Advanced Mode or Simple Mode. In Simple mode it just reads data from the sensor, and verifies that it is between bounds and returns the reading. 
+
+In Advanced mode it reads the value and stores last five readings in an array. The returned value is the median value of the readings in the array. This approach can be used if you encounter some readings that are wrong every now and then.
