@@ -55,7 +55,7 @@ class DS18B20Sensor(object):
 
         if (self.sensorMode == "Advanced"):
             #Array size of last readings
-            self.ARRAY_SIZE = 5
+            self.ARRAY_SIZE = 7
 
         #Initialize Array
         self.arrTemperature = [None] * self.ARRAY_SIZE
