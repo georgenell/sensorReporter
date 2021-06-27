@@ -45,6 +45,7 @@ class mqttConnection(object):
     self.client.on_message = self.msgProc
     self.client.on_disconnect = self.on_disconnect
     self.client.username_pw_set(params("User"), params("Password"))
+    self.qos = params("QOS")
 
     self.logger.info("Attempting to connect to MQTT broker at " + params("Host") + ":" + params("Port"))
     connected = False
@@ -63,18 +64,18 @@ class mqttConnection(object):
     
     self.registered = []
 
-  def publish(self, message, pubTopic):
+  def publish(self, message, pubTopic, retain = False):
     """Called by others to publish a message to the publish topic"""
 
     try:
-      rval = self.client.publish(pubTopic, message)
+      rval = self.client.publish(pubTopic, message, retain=retain)
       if rval[0] == mqtt.MQTT_ERR_NO_CONN:
         self.logger.error("Error publishing update: " + message +  " to " + pubTopic)
         self.comms.reconnect() # try to reconnect again
       else:
         self.logger.info("Published message " + message + " to " + pubTopic)
     except:
-      print "Unexpected error publishing message:", sys.exc_info()[0]
+      self.logger.error("Unexpected error publishing message: "+ sys.exc_info()[0])
 
   def register(self, subTopic, msgHandler):
     """Registers an actuator to receive messages"""

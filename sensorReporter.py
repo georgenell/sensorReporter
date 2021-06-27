@@ -173,19 +173,19 @@ def createDevice(config, section):
 
       return d
     except ImportError:
-      logger.error("%s.%s is not supported on this platform" % module_name, class_name)
+      logger.error("{0}.{1} is not supported on this platform".format(module_name, class_name))
 
 def createConnection(config, section):
 
     try:
       name = config.get(section, "Name")
-      logger.info("Creating connection %s" % (name))
+      logger.info("Creating connection {0}".format(name))
       module_name, class_name = config.get(section, "Class").rsplit(".", 1)
       MyConn = getattr(importlib.import_module(module_name), class_name)
       params = lambda key: config.get(section, key)
       connections[name] = MyConn(on_message, logger, params, sensors, actuators)
     except ImportError:
-      logger.error("%s.%s is not supported on this platform" % module_name, class_name)
+      logger.error("{0}.{1} is not supported on this platform".format(module_name, class_name))
 
 
 def loadConfig(configFile):

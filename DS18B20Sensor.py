@@ -71,6 +71,9 @@ class DS18B20Sensor(object):
         if not self.preserveDestination:
             self.destination = self.destination + "/temperature"
 
+        # For use with MQTT, set a Retain flag on sensors (but not on commands)
+        self.retain = True if params("PreserveDestination").lower() == 'true' else False
+
         self.publish = connections
 
         self.logger.info("----------Configuring DS18B20 Sensor: address='{0}' poll='{1}' destination='{2}' Initial values: Temp='{3}'".format(self.addr, self.poll, self.destination, self.temperature))
@@ -113,7 +116,7 @@ class DS18B20Sensor(object):
 
     def publishStateImpl(self, data, destination):
         for conn in self.publish:
-            conn.publish(data, destination)
+            conn.publish(data, destination, retain=self.retain)
 
 
     def publishState(self):
