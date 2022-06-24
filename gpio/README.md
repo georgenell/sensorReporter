@@ -20,13 +20,13 @@ $ sudo pip3 install adafruit-circuitpython-dht
 Parameter | Required | Restrictions | Purpose
 -|-|-|-
 `Class` | X | `gpio.dht_sensor.DhtSensor` |
-`Connection` | X | Comma separated list of Connections | Where the ON/OFF messages are published.
+`Connection` | X | Comma separated list of Connections | Where the temperature and humidity values are published.
 `Level` | | DEBUG, INFO, WARNING, ERROR | When provided, sets the logging level for the sensor.
 `Poll` | X | Positive number | How often to call the command
 `Sensor` | X | `DHT11`, `DHT22`, or `AM2302` | The type of the sensor.
 `Pin` | X | | GPIO data pin in BMC numbering.
 `HumiDest` | X | | Where to publish the humidity.
-`TempDest` | X | | Where to publishd the temperature.
+`TempDest` | X | | Where to publish the temperature.
 `TempUnit` | X | `F` or `C` | The temperature units
 `Smoothing` | | Boolean | When `True`, publishes the average of the last five readings instead of each individual reading.
 
@@ -246,3 +246,49 @@ Pin = 19
 Circuit diagram
 
 ![example2](circuit_diagram/example2_circuit.png)
+
+## `gpio.ds18b20_sensor.DS18B20Sensor`
+
+A Polling Sensor that reads temperature from a 1-wire DS18B20 sensor.
+
+### Dependencies
+
+This sensor uses 1-wire on a GPIO pin which must be enabled on the Raspberry Pi. See setup instructions [here](https://learn.adafruit.com/adafruits-raspberry-pi-lesson-11-ds18b20-temperature-sensing/hardware).
+
+### Parameters
+
+Parameter | Required | Restrictions | Purpose
+-|-|-|-
+`Class` | X | `gpio.ds18b20_sensor.DS18B20Sensor` |
+`Connection` | X | Comma separated list of Connections | Where the temperature values are published.
+`Level` | | DEBUG, INFO, WARNING, ERROR | When provided, sets the logging level for the sensor.
+`Poll` | X | Positive number | How often to call the command, in seconds
+`Address` | X | | 1-wire address for the sensor, eg; 28-000004828fb3
+`TempDest` | X | | Where to publish the temperature.
+`TempUnit` | X | `F` or `C` | The temperature units
+`Smoothing` | | Boolean | When `True`, publishes the average of the last five readings instead of each individual reading.
+
+### Example Config
+
+```ini
+[Logging]
+Syslog = YES
+Level = INFO
+
+[Connection1]
+Class = openhab_rest.rest_conn.OpenhabREST
+Name = openHAB
+URL = http://localhost:8080
+RefreshItem = Test_Refresh
+Level = INFO
+
+[Sensor1]
+Class = gpio.ds18b20_sensor.DS18B20Sensor
+Connection = openHAB
+Poll = 2
+Address = 28-000004828fb3
+TempDest = temperature
+TempUnit = C
+Smoothing = False
+Level = DEBUG
+```
